@@ -6,7 +6,7 @@ const _ = require("lodash");
 
 router.get("/", async (req, res) => {
   console.log("Main Webpage");
-  res.send("Welcome to the main page!!!");
+  res.send("Welcome to the Cloud Share!!!");
 });
 
 router.post("/upload", async (req, res) => {
