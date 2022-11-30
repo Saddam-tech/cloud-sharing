@@ -1,5 +1,7 @@
 const express = require("express");
 const router = express.Router();
+const fs = require("fs");
+const shell = require("shelljs");
 
 router.get("/", async (req, res) => {
   console.log("Main Webpage");
@@ -15,9 +17,12 @@ router.post("/upload", async (req, res) => {
       });
     } else {
       let file = req.files.file;
-
-      file.mv("/Users/saddam/Desktop/" + file.name);
-      console.log({ file: file.name });
+      const path = "/Users/saddam/Desktop/uploads/";
+      if (!fs.existsSync(path)) {
+        shell.mkdir("-p", path);
+      }
+      file.mv(path + file.name);
+      console.log("File upload detected!", { file: file.name });
 
       res.send({
         status: true,
