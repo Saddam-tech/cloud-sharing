@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const fs = require("fs");
 const shell = require("shelljs");
+const _ = require("lodash");
 
 router.get("/", async (req, res) => {
   console.log("Main Webpage");
@@ -16,22 +17,28 @@ router.post("/upload", async (req, res) => {
         message: "No file uploaded!",
       });
     } else {
-      let file = req.files.file;
+      let data = [];
       const path = "/Users/saddam/Desktop/uploads/";
       if (!fs.existsSync(path)) {
         shell.mkdir("-p", path);
       }
-      file.mv(path + file.name);
-      console.log("File upload detected!", { file: file.name });
 
-      res.send({
-        status: true,
-        message: "File is uploaded",
-        data: {
+      _.forEach(_.keysIn(req.files.file), (key) => {
+        let file = req.files.file[key];
+
+        file.mv(path + file.name);
+        data.push({
           name: file.name,
           mimetype: file.mimetype,
           size: file.size,
-        },
+        });
+      });
+      console.log("File upload detected!", data);
+
+      res.send({
+        status: true,
+        message: "Files are uploaded",
+        data,
       });
     }
   } catch (err) {
