@@ -4,8 +4,12 @@ const port = 3000;
 const path = require("path");
 const indexRouter = require("./routes/main");
 const cors = require("cors");
+const morgan = require("morgan");
+const fileUpload = require("express-fileupload");
 
 app.use(cors());
+
+app.use(fileUpload({ createParentPath: true }));
 
 app.set("views", path.join(__dirname, "views"));
 app.use(express.json());
