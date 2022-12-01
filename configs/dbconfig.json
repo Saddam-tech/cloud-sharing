@@ -1,0 +1,10 @@
+{
+  "development": {
+    "host": "localhost",
+    "username": "cloudshare",
+    "port": "3306",
+    "password": "5y8DZK1UVHVWShGJqJaB",
+    "database": "cloudshare",
+    "dialect": "mysql"
+  }
+}
