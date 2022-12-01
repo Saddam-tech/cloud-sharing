@@ -3,3 +3,5 @@ const messages = {
   NOT_FOUND: "DATA-NOT-FOUND!",
   DUBLICATE_DATA: "DUBLICATE-DATA!",
 };
+
+module.exports = { messages };

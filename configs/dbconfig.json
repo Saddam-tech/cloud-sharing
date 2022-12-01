@@ -3,8 +3,8 @@
     "host": "localhost",
     "username": "cloudshare",
     "port": "3306",
-    "password": "5y8DZK1UVHVWShGJqJaB",
+    "password": "samtech",
     "database": "cloudshare",
-    "dialect": "mysql"
+    "dialect": "mariadb"
   }
 }

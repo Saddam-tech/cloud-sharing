@@ -7,6 +7,7 @@ const _ = require("lodash");
 const { resperr, respok } = require("../utils/rest");
 const db = require("../models");
 const { create_uuid_via_namespace } = require("../utils/utils");
+const jwt = require("jsonwebtoken");
 
 async function createJWT({ jfilter, userinfo }) {
   if (userinfo) {
@@ -22,7 +23,6 @@ async function createJWT({ jfilter, userinfo }) {
     return false;
   }
   let expiresIn = "48h";
-
   let token = jwt.sign(
     {
       type: "JWT",
@@ -49,36 +49,40 @@ router.post("/signup", async (req, res) => {
     return;
   }
 
-  let respuser = await db["users"].findOne({
-    raw: true,
-    where: { username },
-  });
+  try {
+    let respuser = await db["users"].findOne({
+      raw: true,
+      where: { username },
+    });
 
-  if (respuser) {
-    resperr(res, messages.DUBLICATE_DATA);
-    return;
-  }
-  let uuid = create_uuid_via_namespace(username);
-  let user = await db["users"].create({
-    username,
-    password,
-    uuid,
-    active: 1,
-  });
-
-  let _user = await db["users"].findOne({
-    raw: true,
-    where: {
+    if (respuser) {
+      resperr(res, messages.DUBLICATE_DATA);
+      return;
+    }
+    let uuid = create_uuid_via_namespace(username);
+    let user = await db["users"].create({
       username,
-    },
-  });
-  let token = await createJWT({ userinfo: _user });
-  if (token?.password) {
-    delete token?.password;
-  }
+      password,
+      uuid,
+      active: 1,
+    });
 
-  respok(res, "CREATED", null, { respdata: { ...token } });
-  return;
+    let _user = await db["users"].findOne({
+      raw: true,
+      where: {
+        username,
+      },
+    });
+    let token = await createJWT({ userinfo: _user });
+    if (token?.password) {
+      delete token?.password;
+    }
+
+    respok(res, "CREATED", null, { respdata: { ...token } });
+    return;
+  } catch (err) {
+    console.log(err);
+  }
 });
 
 router.post("/login", async (req, res) => {
@@ -88,32 +92,35 @@ router.post("/login", async (req, res) => {
     resperr(res, messages.ARG_MISSING);
     return;
   }
+  try {
+    let respuser = await db["users"].findOne({
+      raw: true,
+      where: {
+        username,
+        password,
+      },
+    });
 
-  let respuser = await db["users"].findOne({
-    raw: true,
-    where: {
-      username,
-      password,
-    },
-  });
+    if (!respuser) {
+      resperr(res, messages.NOT_FOUND);
+      return;
+    }
 
-  if (!respuser) {
-    resperr(res, messages.NOT_FOUND);
-    return;
+    let token = await createJWT({ userinfo: respuser });
+    if (token?.password) {
+      delete token?.password;
+    }
+
+    respok(res, null, null, { respdata: { ...token } });
+    await db["sessions"].create({
+      userid: respuser?.id,
+      token: token?.token,
+      active: 1,
+      useruuid: respuser?.uuid,
+    });
+  } catch (err) {
+    console.log(err);
   }
-
-  let token = await createJWT({ userinfo: respuser });
-  if (token?.password) {
-    delete token?.password;
-  }
-
-  respok(res, null, null, { respdata: { ...token } });
-  await db["sessions"].create({
-    userid: respuser?.id,
-    token: token?.token,
-    active: 1,
-    useruuid: respuser?.uuid,
-  });
 });
 
 module.exports = router;

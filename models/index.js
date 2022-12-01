@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const Sequelize = require("sequelize");
 const basename = path.basename(__filename); // const env = 'production' // 'developmentDesktop20191004' //  //   // process.env.NODE_ENV ||
-const env = process.env.NODE_ENV || "development"; //test 'developmentpc' //  // 'development'// 'production' //
+const env = "development"; //test 'developmentpc' //  // 'development'// 'production' //
 const config = require("../configs/dbconfig.json")[env]; // ./apiServe // __dirname
 // let config
 const db = {};

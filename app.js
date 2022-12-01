@@ -3,9 +3,12 @@ const app = express();
 const port = 3001;
 const path = require("path");
 const indexRouter = require("./routes/main");
+const usersRouter = require("./routes/users");
 const cors = require("cors");
 const morgan = require("morgan");
 const fileUpload = require("express-fileupload");
+
+require("dotenv").config();
 
 app.use(cors());
 
@@ -24,5 +27,6 @@ app.listen(port, () => {
 });
 
 app.use("/", indexRouter);
+app.use("/users", usersRouter);
 
 module.exports = app;

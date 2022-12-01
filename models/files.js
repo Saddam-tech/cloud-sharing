@@ -24,7 +24,6 @@ module.exports = function (sequelize, DataTypes) {
         allowNull: true,
       },
       userid: {
-        autoIncrement: true,
         type: DataTypes.INTEGER(11).UNSIGNED,
         allowNull: false,
         primaryKey: true,
