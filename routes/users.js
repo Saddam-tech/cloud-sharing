@@ -74,8 +74,8 @@ router.post("/signup", async (req, res) => {
       },
     });
     let token = await createJWT({ userinfo: _user });
-    if (token?.password) {
-      delete token?.password;
+    if (token.myinfo?.password) {
+      delete token.myinfo?.password;
     }
 
     respok(res, "CREATED", null, { respdata: { ...token } });
@@ -107,8 +107,8 @@ router.post("/login", async (req, res) => {
     }
 
     let token = await createJWT({ userinfo: respuser });
-    if (token?.password) {
-      delete token?.password;
+    if (token.myinfo?.password) {
+      delete token.myinfo?.password;
     }
 
     respok(res, null, null, { respdata: { ...token } });
