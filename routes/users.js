@@ -61,7 +61,6 @@ router.post("/signin", async (req, res) => {
       uuid,
       active: 1,
     });
-    console.log("random", randomhex, password);
     let token = await createJWT({ userinfo: user });
     await db["sessions"].create({
       userid: user?.id,

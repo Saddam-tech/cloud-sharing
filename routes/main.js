@@ -3,14 +3,24 @@ const router = express.Router();
 const fs = require("fs");
 const shell = require("shelljs");
 const _ = require("lodash");
+const { auth } = require("../utils/authMiddleware");
 
 router.get("/", async (req, res) => {
   console.log("Main Webpage");
   res.send("Welcome to the Cloud Share!!!");
 });
 
-router.post("/upload", async (req, res) => {
+router.post("/upload", auth, async (req, res) => {
   try {
+    let { id, uuid } = req.decoded.dataValues;
+    console.log({ decoded: req.decoded });
+    if (!id || !uuid) {
+      res.send({
+        status: false,
+        message: "USER NOT FOUND!",
+      });
+      return;
+    }
     if (!req.files) {
       res.send({
         status: false,
@@ -18,7 +28,7 @@ router.post("/upload", async (req, res) => {
       });
     } else {
       let data = [];
-      const path = "/Users/saddam/Desktop/uploads/";
+      const path = `/Users/saddam/Desktop/uploads/${uuid}/`;
       if (!fs.existsSync(path)) {
         shell.mkdir("-p", path);
       }
