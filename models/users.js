@@ -1,7 +1,5 @@
 /* jshint indent: 2 */
 
-const { join } = require("lodash");
-
 module.exports = function (sequelize, DataTypes) {
   return sequelize.define(
     "users",

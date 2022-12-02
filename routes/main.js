@@ -38,7 +38,7 @@ router.post("/upload", auth, async (req, res) => {
 
       _.forEach(_.keysIn(req.files.file), (key) => {
         let file = req.files.file[key];
-        let itemuuid = create_uuid_via_namespace(file.name);
+        let itemuuid = create_uuid_via_namespace(id + file.name);
         file.mv(path + file.name);
         data.push({
           name: file.name,
