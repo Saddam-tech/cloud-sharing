@@ -11,7 +11,7 @@ const { respok } = require("../utils/rest");
 
 router.get("/", async (req, res) => {
   console.log("Main Webpage");
-  res.send("Welcome to the Cloud Share!!!");
+  res.send("Welcome to the CloudShare!!!");
 });
 
 router.post("/upload", auth, async (req, res) => {
@@ -31,13 +31,13 @@ router.post("/upload", auth, async (req, res) => {
       });
     } else {
       let data = [];
+      let file;
       const path = `/Users/saddam/Desktop/uploads/${uuid}/`;
       if (!fs.existsSync(path)) {
         shell.mkdir("-p", path);
       }
-
-      _.forEach(_.keysIn(req.files.file), (key) => {
-        let file = req.files.file[key];
+      if (!Array.isArray(req.files.file)) {
+        file = req.files.file;
         let itemuuid = create_uuid_via_namespace(id + file.name);
         file.mv(path + file.name);
         data.push({
@@ -49,7 +49,23 @@ router.post("/upload", auth, async (req, res) => {
           uuid: itemuuid,
           url: path + file.name,
         });
-      });
+      } else {
+        _.forEach(_.keysIn(req.files.file), (key) => {
+          file = req.files.file[key];
+          let itemuuid = create_uuid_via_namespace(id + file.name);
+          file.mv(path + file.name);
+          data.push({
+            name: file.name,
+            mimetype: file.mimetype,
+            size: file.size,
+            userid: id,
+            useruuid: uuid,
+            uuid: itemuuid,
+            url: path + file.name,
+          });
+        });
+      }
+
       console.log("File upload detected!", data);
 
       await db["files"].bulkCreate(data);
