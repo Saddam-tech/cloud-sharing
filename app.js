@@ -1,6 +1,5 @@
 const express = require("express");
 const app = express();
-const port = 3001;
 const path = require("path");
 const indexRouter = require("./routes/main");
 const usersRouter = require("./routes/users");
@@ -22,10 +21,6 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, "public")));
 app.use((req, res, next) => {
   next();
-});
-
-app.listen(port, () => {
-  console.log(`App listening on port ${port}`);
 });
 
 app.use("/", indexRouter);
