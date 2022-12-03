@@ -26,4 +26,11 @@ app.use((req, res, next) => {
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 
+app.post("/registrar", function (req, res) {
+  console.log("Rota registrar");
+  console.log("REQ.query...." + req.params.name);
+  res.status(500).send("testing");
+  //application.app.controles.login.registraUsuario(application, req, res);
+});
+
 module.exports = app;
