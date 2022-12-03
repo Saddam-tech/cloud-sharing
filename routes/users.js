@@ -5,6 +5,7 @@ const shell = require("shelljs");
 const { messages } = require("../utils/messages");
 const _ = require("lodash");
 const { resperr, respok } = require("../utils/rest");
+const { auth } = require("../utils/authMiddleware");
 const db = require("../models");
 const {
   create_uuid_via_namespace,
@@ -82,6 +83,27 @@ router.post("/signin", async (req, res) => {
     return;
   } catch (err) {
     console.log(err);
+    res.status(500).send(err);
+  }
+});
+
+router.post("/logout", auth, async (req, res) => {
+  try {
+    let { id, uuid } = req.decoded.dataValues;
+    if (!id || !uuid) {
+      resperr(res, messages.ARG_MISSING);
+      return;
+    }
+    console.log("USER LOGOUT ::");
+    console.log({ id, uuid });
+    await db["sessions"].update(
+      { active: 0 },
+      { where: { token: req.headers.authorization } }
+    );
+    respok(res, messages.LOGOUT);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send(err);
   }
 });
 
