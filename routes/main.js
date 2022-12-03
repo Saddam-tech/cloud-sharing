@@ -32,7 +32,8 @@ router.post("/upload", auth, async (req, res) => {
     } else {
       let data = [];
       let file;
-      const path = `/Users/saddam/Desktop/uploads/${uuid}/`;
+      //   const path = `/Users/saddam/Desktop/uploads/${uuid}/`;
+      const path = `/var/resource/uploads/${uuid}/`;
       if (!fs.existsSync(path)) {
         shell.mkdir("-p", path);
       }
