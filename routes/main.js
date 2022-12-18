@@ -16,7 +16,9 @@ router.get("/", async (req, res) => {
 
 router.post("/upload", auth, async (req, res) => {
   try {
-    let { id, uuid } = req.decoded.dataValues;
+    console.log("dataValues", req.decoded.dataValues);
+    console.log("req.decoded", req.decoded);
+    let { id, uuid } = req.decoded;
     if (!id || !uuid) {
       res.send({
         status: false,
@@ -82,7 +84,7 @@ router.post("/upload", auth, async (req, res) => {
 
 router.get("/my/files", auth, async (req, res) => {
   try {
-    let { uuid: useruuid } = req.decoded.dataValues;
+    let { uuid: useruuid } = req.decoded;
     if (!useruuid) {
       res.send({
         status: false,

@@ -68,20 +68,20 @@ router.post("/signin", async (req, res) => {
       userid: user?.id,
       token: token?.token,
       active: 1,
-      useruuid: uuid,
+      useruuid: user.uuid,
     });
     if (token?.myinfo?.password) {
-      delete token.myinfo?.password;
+      delete token?.myinfo?.password;
     }
     console.log("USER SIGNIN ::");
     console.log({
       user: user.id,
       username,
-      password: user.password,
+      password,
       uuid: user.uuid,
       active: user.active,
     });
-    respok(res, "CREATED", null, { respdata: { ...token } });
+    respok(res, "SIGNED IN!", null, { respdata: { ...token } });
     return;
   } catch (err) {
     console.log(err);
@@ -125,7 +125,7 @@ router.post("/signup", async (req, res) => {
       useruuid: uuid,
     });
     if (token?.myinfo?.password) {
-      delete token.myinfo?.password;
+      delete token?.myinfo?.password;
     }
     console.log("USER SIGNIN ::");
     console.log({
@@ -145,7 +145,7 @@ router.post("/signup", async (req, res) => {
 
 router.post("/logout", auth, async (req, res) => {
   try {
-    let { id, uuid } = req.decoded.dataValues;
+    let { id, uuid } = req.decoded;
     if (!id || !uuid) {
       resperr(res, messages.ARG_MISSING);
       return;
