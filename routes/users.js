@@ -1,7 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const fs = require("fs");
-const shell = require("shelljs");
 const { messages } = require("../utils/messages");
 const _ = require("lodash");
 const { resperr, respok } = require("../utils/rest");
@@ -12,7 +10,6 @@ const {
   generaterandomhex,
 } = require("../utils/utils");
 const jwt = require("jsonwebtoken");
-const users = require("../models/users");
 
 async function createJWT({ jfilter, userinfo }) {
   if (userinfo) {

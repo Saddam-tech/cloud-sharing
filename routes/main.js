@@ -8,6 +8,7 @@ const db = require("../models");
 const { create_uuid_via_namespace } = require("../utils/utils");
 const { messages } = require("../utils/messages");
 const { respok } = require("../utils/rest");
+const hostname = "15.164.222.234";
 
 router.get("/", async (req, res) => {
   console.log("Main Webpage");
@@ -50,7 +51,7 @@ router.post("/upload", auth, async (req, res) => {
           userid: id,
           useruuid: uuid,
           uuid: itemuuid,
-          url: path + file.name,
+          url: hostname + path + file.name,
         });
       } else {
         _.forEach(_.keysIn(req.files.file), (key) => {
@@ -64,7 +65,7 @@ router.post("/upload", auth, async (req, res) => {
             userid: id,
             useruuid: uuid,
             uuid: itemuuid,
-            url: path + file.name,
+            url: hostname + path + file.name,
           });
         });
       }
