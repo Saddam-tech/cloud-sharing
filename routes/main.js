@@ -11,7 +11,7 @@ const { respok } = require("../utils/rest");
 
 router.get("/", async (req, res) => {
   console.log("Main Webpage");
-  res.send("Welcome to the CloudShare!!!");
+  res.send("Welcome to CloudShare!!!");
 });
 
 router.post("/upload", auth, async (req, res) => {

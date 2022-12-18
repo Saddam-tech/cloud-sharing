@@ -47,17 +47,72 @@ async function createJWT({ jfilter, userinfo }) {
 }
 
 router.post("/signin", async (req, res) => {
-  let { password } = req.body;
+  let { username, password } = req.body;
 
-  if (!password) {
+  if (!username || !password) {
     resperr(res, messages.ARG_MISSING);
     return;
   }
 
   try {
+    let user = await db["users"].findOne({
+      raw: true,
+      where: { username, password },
+    });
+    if (!user) {
+      resperr(res, messages.NOT_FOUND);
+      return;
+    }
+    let token = await createJWT({ userinfo: user });
+    await db["sessions"].create({
+      userid: user?.id,
+      token: token?.token,
+      active: 1,
+      useruuid: uuid,
+    });
+    if (token?.myinfo?.password) {
+      delete token.myinfo?.password;
+    }
+    console.log("USER SIGNIN ::");
+    console.log({
+      user: user.id,
+      username,
+      password: user.password,
+      uuid: user.uuid,
+      active: user.active,
+    });
+    respok(res, "CREATED", null, { respdata: { ...token } });
+    return;
+  } catch (err) {
+    console.log(err);
+    res.status(500).send(err);
+  }
+});
+
+router.post("/signup", async (req, res) => {
+  try {
+    let { username, password } = req.body;
+
+    if (!username || !password) {
+      resperr(res, messages.ARG_MISSING);
+      return;
+    }
+
+    let user;
+
+    user = await db["users"].findOne({
+      raw: true,
+      where: { username, password },
+    });
+    if (user) {
+      resperr(res, messages.DUBLICATE_DATA);
+      return;
+    }
+
     let randomhex = generaterandomhex(10);
     let uuid = create_uuid_via_namespace(randomhex + password);
-    let user = await db["users"].create({
+    user = await db["users"].create({
+      username,
       password,
       uuid,
       active: 1,
@@ -75,6 +130,7 @@ router.post("/signin", async (req, res) => {
     console.log("USER SIGNIN ::");
     console.log({
       user: user.id,
+      username,
       password: user.password,
       uuid: user.uuid,
       active: user.active,
