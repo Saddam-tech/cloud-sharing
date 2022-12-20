@@ -8,6 +8,7 @@ const db = require("../models");
 const { create_uuid_via_namespace } = require("../utils/utils");
 const { messages } = require("../utils/messages");
 const { respok } = require("../utils/rest");
+const { storefiletoawss3 } = require("../utils/config-s3");
 const hostname = "15.164.222.234";
 
 router.get("/", async (req, res) => {
@@ -35,15 +36,16 @@ router.post("/upload", auth, async (req, res) => {
     } else {
       let data = [];
       let file;
-      //   const path = `/Users/saddam/Desktop/uploads/${uuid}/`;
-      const path = `/home/ubuntu/resource/uploads/${uuid}/`;
-      if (!fs.existsSync(path)) {
-        shell.mkdir("-p", path);
-      }
+      let urltos3;
+      // const path = `/home/ubuntu/resource/uploads/${uuid}/`;
+      // if (!fs.existsSync(path)) {
+      //   shell.mkdir("-p", path);
+      // }
       if (!Array.isArray(req.files.file)) {
         file = req.files.file;
         let itemuuid = create_uuid_via_namespace(id + file.name);
-        file.mv(path + file.name);
+        // file.mv(path + file.name);
+        urltos3 = storefiletoawss3(file.name);
         data.push({
           name: file.name,
           mimetype: file.mimetype,
@@ -51,13 +53,14 @@ router.post("/upload", auth, async (req, res) => {
           userid: id,
           useruuid: uuid,
           uuid: itemuuid,
-          url: hostname + path + file.name,
+          url: urltos3,
         });
       } else {
         _.forEach(_.keysIn(req.files.file), (key) => {
           file = req.files.file[key];
           let itemuuid = create_uuid_via_namespace(id + file.name);
-          file.mv(path + file.name);
+          urltos3 = file.name;
+          // file.mv(path + file.name);
           data.push({
             name: file.name,
             mimetype: file.mimetype,
@@ -65,7 +68,7 @@ router.post("/upload", auth, async (req, res) => {
             userid: id,
             useruuid: uuid,
             uuid: itemuuid,
-            url: hostname + path + file.name,
+            url: urltos3,
           });
         });
       }
