@@ -11,7 +11,7 @@ const { respok } = require("../utils/rest");
 
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 require("dotenv").config();
-const hostname = "15.164.222.234";
+const hostname = process.env.server_address;
 
 const bucket_name = process.env.BUCKET_NAME;
 const bucket_region = process.env.BUCKET_REGION;
