@@ -8,10 +8,12 @@ const db = require("../models");
 const { create_uuid_via_namespace } = require("../utils/utils");
 const { messages } = require("../utils/messages");
 const { respok } = require("../utils/rest");
-
-const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+const crypto = require('crypto');
+const { S3Client, PutObjectCommand, GetObjectCommand } = require("@aws-sdk/client-s3");
 require("dotenv").config();
 const hostname = process.env.server_address;
+// generating a url for the s3 uploaded images
+const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 
 const bucket_name = process.env.BUCKET_NAME;
 const bucket_region = process.env.BUCKET_REGION;
@@ -25,6 +27,8 @@ const s3 = new S3Client({
   },
   region: bucket_region,
 });
+
+const randomImageName = (bytes=32) => crypto.randomBytes(bytes).toString('hex');
 
 router.get("/", async (req, res) => {
   console.log("Main Webpage");
@@ -50,17 +54,14 @@ router.post("/upload", auth, async (req, res) => {
       });
     } else {
       let data = [];
-      let file;
-      let params;
-      let itemuuid;
-      let command;
+      let file, params, itemuuid, command;
       // const path = `/home/ubuntu/resource/uploads/${uuid}/`;
       // if (!fs.existsSync(path)) {
       //   shell.mkdir("-p", path);
       // }
       if (!Array.isArray(req.files.file)) {
         file = req.files.file;
-        itemuuid = create_uuid_via_namespace(id + file.name);
+        itemuuid = randomImageName();
         // file.mv(path + file.name);
         params = {
           Bucket: bucket_name,
@@ -75,14 +76,13 @@ router.post("/upload", auth, async (req, res) => {
           userid: id,
           useruuid: uuid,
           uuid: itemuuid,
-          // url: urltos3,
         });
         command = new PutObjectCommand(params);
         await s3.send(command);
       } else {
         _.forEach(_.keysIn(req.files.file), async (key) => {
           file = req.files.file[key];
-          itemuuid = create_uuid_via_namespace(id + file.name);
+          itemuuid = randomImageName();
           params = {
             Bucket: bucket_name,
             Key: itemuuid,
@@ -97,7 +97,6 @@ router.post("/upload", auth, async (req, res) => {
             userid: id,
             useruuid: uuid,
             uuid: itemuuid,
-            // url: urltos3,
           });
           command = new PutObjectCommand(params);
           await s3.send(command);
@@ -131,6 +130,16 @@ router.get("/my/files", auth, async (req, res) => {
       raw: true,
       where: { useruuid },
     });
+     let objectParams, objectCommand, urltos3;
+    for (let el of response) {
+	objectParams = {
+        Bucket: bucket_name,
+        Key: el.uuid
+        }
+        objectCommand = new GetObjectCommand(objectParams);
+        urltos3 = await getSignedUrl(s3, objectCommand, {expiresIn: 3600});
+        el.urltos3 = urltos3;
+    }
     respok(res, null, null, { response, payload: { count: response.length } });
     return;
   } catch (err) {
