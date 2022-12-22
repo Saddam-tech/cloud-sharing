@@ -33,7 +33,7 @@ router.get("/", async (req, res) => {
 
 router.post("/upload", auth, async (req, res) => {
   try {
-    console.log("dataValues", req.decoded.dataValues);
+    console.log("dataValues", req.decoded);
     console.log("req.decoded", req.decoded);
     let { id, uuid } = req.decoded;
     if (!id || !uuid) {
