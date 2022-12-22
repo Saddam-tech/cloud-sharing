@@ -8,8 +8,12 @@ const db = require("../models");
 const { create_uuid_via_namespace } = require("../utils/utils");
 const { messages } = require("../utils/messages");
 const { respok } = require("../utils/rest");
-const crypto = require('crypto');
-const { S3Client, PutObjectCommand, GetObjectCommand } = require("@aws-sdk/client-s3");
+const crypto = require("crypto");
+const {
+  S3Client,
+  PutObjectCommand,
+  GetObjectCommand,
+} = require("@aws-sdk/client-s3");
 require("dotenv").config();
 const hostname = process.env.server_address;
 // generating a url for the s3 uploaded images
@@ -28,7 +32,8 @@ const s3 = new S3Client({
   region: bucket_region,
 });
 
-const randomImageName = (bytes=32) => crypto.randomBytes(bytes).toString('hex');
+const randomImageName = (bytes = 32) =>
+  crypto.randomBytes(bytes).toString("hex");
 
 router.get("/", async (req, res) => {
   console.log("Main Webpage");
@@ -130,15 +135,15 @@ router.get("/my/files", auth, async (req, res) => {
       raw: true,
       where: { useruuid },
     });
-     let objectParams, objectCommand, urltos3;
+    let objectParams, objectCommand, urltos3;
     for (let el of response) {
-	objectParams = {
+      objectParams = {
         Bucket: bucket_name,
-        Key: el.uuid
-        }
-        objectCommand = new GetObjectCommand(objectParams);
-        urltos3 = await getSignedUrl(s3, objectCommand, {expiresIn: 3600});
-        el.urltos3 = urltos3;
+        Key: el.uuid,
+      };
+      objectCommand = new GetObjectCommand(objectParams);
+      urltos3 = await getSignedUrl(s3, objectCommand, { expiresIn: 3600 });
+      el.urltos3 = urltos3;
     }
     respok(res, null, null, { response, payload: { count: response.length } });
     return;
