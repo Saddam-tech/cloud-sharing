@@ -65,7 +65,7 @@ router.post("/upload", auth, async (req, res) => {
         params = {
           Bucket: bucket_name,
           Key: itemuuid,
-          Body: file.buffer,
+          Body: file.data,
           ContentType: file.mimetype,
         };
         data.push({
@@ -86,7 +86,7 @@ router.post("/upload", auth, async (req, res) => {
           params = {
             Bucket: bucket_name,
             Key: itemuuid,
-            Body: file.buffer,
+            Body: file.data,
             ContentType: file.mimetype,
           };
           // file.mv(path + file.name);
