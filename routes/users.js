@@ -124,7 +124,7 @@ router.post("/signup", async (req, res) => {
     if (token?.myinfo?.password) {
       delete token?.myinfo?.password;
     }
-    console.log("USER SIGNIN ::");
+    console.log("USER SIGNUP ::");
     console.log({
       user: user.id,
       username,
